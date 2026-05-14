@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
@@ -25,7 +26,7 @@ export default function Navbar() {
     <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`}>
       <div className={`container ${styles.container}`}>
         <Link href="/" className={styles.logo}>
-          🎂 Cake Gallery
+          <Image src="/logo-cropped.png" alt="FrozT Logo" width={120} height={40} style={{ objectFit: 'contain' }} />
         </Link>
         
         {/* Desktop Nav */}

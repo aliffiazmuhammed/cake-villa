@@ -58,7 +58,7 @@ export default function AdminLogin() {
       
       <div className={styles.loginCard}>
         <div className={styles.header}>
-          <h1>Cake Gallery</h1>
+          <h1>FrozT</h1>
           <p>Admin Portal</p>
         </div>
 

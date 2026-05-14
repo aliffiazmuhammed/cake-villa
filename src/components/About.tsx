@@ -64,7 +64,7 @@ export default function About() {
         <div className={styles.content}>
           <h2 ref={headingRef} className={styles.heading}>Our Story</h2>
           <p ref={textRef} className={styles.paragraph}>
-            Cake Gallery was born from a passion for baking and a love of beautiful things. 
+            FrozT was born from a passion for baking and a love of beautiful things. 
             Every cake is made from scratch, with the finest ingredients and an artist's eye for detail.
           </p>
           

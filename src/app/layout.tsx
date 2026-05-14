@@ -15,7 +15,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Cake Gallery | Handcrafted Artisan Cakes",
+  title: "FrozT | #cakeiteasy",
   description: "Where Every Cake Tells a Story. Handcrafted custom cakes for your most precious moments.",
 };
 

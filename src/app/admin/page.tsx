@@ -289,7 +289,7 @@ export default function AdminDashboard() {
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ""}`}>
         <div className={styles.logo}>
-          <h2>Cake Gallery</h2>
+          <h2>FrozT</h2>
           <span>Admin</span>
         </div>
         <nav className={styles.nav}>

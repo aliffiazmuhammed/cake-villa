@@ -8,8 +8,8 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={`container ${styles.container}`}>
         <div className={styles.logoSection}>
-          <h2 className={styles.logo}>🎂 Cake Gallery</h2>
-          <p className={styles.tagline}>Baked with love, designed with passion.</p>
+          <h2 className={styles.logo}>FrozT</h2>
+          <p className={styles.tagline}>#cakeiteasy</p>
         </div>
         
         <div className={styles.linksSection}>
@@ -33,7 +33,7 @@ export default function Footer() {
       </div>
       
       <div className={styles.bottom}>
-        <p>&copy; 2025 Cake Gallery. All rights reserved.</p>
+        <p>&copy; 2026 FrozT. All rights reserved.</p>
       </div>
       
       {/* Floating WhatsApp Button */}
