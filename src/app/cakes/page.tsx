@@ -1,20 +1,11 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import CakeCard from "../../components/CakeCard";
 import styles from "./cakes.module.css";
-
-const mockCakes = [
-  { id: '1', name: 'Classic Wedding Tower', category: 'wedding', price: 12000, sizeWeight: { min: 3, max: 10 }, ingredients: ['Vanilla Sponge', 'Buttercream', 'Edible Flowers'], imageUrl: '' },
-  { id: '2', name: 'Chocolate Overload', category: 'birthday', price: 1500, sizeWeight: { min: 1, max: 3 }, ingredients: ['Belgian Chocolate', 'Ganache', 'Truffles'], imageUrl: '' },
-  { id: '3', name: 'Custom Photo Cake', category: 'photo', price: 1800, sizeWeight: { min: 1, max: 2 }, ingredients: ['Vanilla', 'Edible Print', 'Cream'], imageUrl: '' },
-  { id: '4', name: 'Rainbow Cupcake Set', category: 'cupcake', price: 800, sizeWeight: { min: 0.5, max: 1 }, ingredients: ['Assorted Flavors', 'Frosting'], imageUrl: '' },
-  { id: '5', name: 'Sculpted Teddy Cake', category: 'fondant', price: 2500, sizeWeight: { min: 1.5, max: 3 }, ingredients: ['Chocolate', 'Fondant', 'Marshmallow'], imageUrl: '' },
-  { id: '6', name: 'New York Cheesecake', category: 'cheesecake', price: 1200, sizeWeight: { min: 1, max: 2 }, ingredients: ['Cream Cheese', 'Graham Cracker Crust'], imageUrl: '' },
-];
 
 const categories = ['all', 'wedding', 'birthday', 'photo', 'cupcake', 'fondant', 'cheesecake'];
 
@@ -22,10 +13,29 @@ function CakesContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category') || 'all';
   const [selectedCategory, setSelectedCategory] = useState(categoryParam);
+  const [cakes, setCakes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchCakes = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/cakes`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Failed to fetch cakes");
+        setCakes(data.data);
+      } catch (err: any) {
+        setError(err.message || "Error fetching cakes");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCakes();
+  }, []);
 
   const filteredCakes = selectedCategory === 'all' 
-    ? mockCakes 
-    : mockCakes.filter(cake => cake.category === selectedCategory);
+    ? cakes 
+    : cakes.filter((cake: any) => cake.category === selectedCategory);
 
   return (
     <main className={styles.main}>
@@ -45,11 +55,19 @@ function CakesContent() {
           ))}
         </div>
         
-        <div className={styles.grid}>
-          {filteredCakes.map(cake => (
-            <CakeCard key={cake.id} cake={cake} />
-          ))}
-        </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '3rem' }}>Loading cakes...</div>
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'red' }}>{error}</div>
+        ) : filteredCakes.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '3rem' }}>No cakes found in this category.</div>
+        ) : (
+          <div className={styles.grid}>
+            {filteredCakes.map((cake: any) => (
+              <CakeCard key={cake._id} cake={cake} />
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );

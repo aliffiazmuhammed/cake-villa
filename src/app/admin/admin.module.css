@@ -1,0 +1,376 @@
+.dashboardContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: var(--font-body), sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: white;
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.logo h2 {
+  font-family: var(--font-heading), serif;
+  color: var(--foreground);
+  margin-bottom: 0.25rem;
+}
+
+.logo span {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #888;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.nav button {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav button:hover {
+  background: rgba(0, 0, 0, 0.02);
+  color: var(--foreground);
+}
+
+.nav button.activeNav {
+  background: linear-gradient(45deg, var(--secondary), var(--accent));
+  color: var(--foreground);
+  box-shadow: 0 4px 12px rgba(247, 202, 201, 0.3);
+}
+
+.logoutContainer {
+  margin-top: auto;
+}
+
+.logoutBtn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #ffcdd2;
+  background: #ffebee;
+  color: #c62828;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logoutBtn:hover {
+  background: #ffcdd2;
+}
+
+/* Main Content */
+.mainContent {
+  flex: 1;
+  margin-left: 260px;
+  padding: 2rem 3rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 1rem;
+}
+
+.header h1 {
+  font-family: var(--font-heading), serif;
+  font-size: 2rem;
+  color: var(--foreground);
+}
+
+.userInfo {
+  font-weight: 600;
+  color: #666;
+}
+
+.contentArea {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+/* Orders Tab */
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th, .table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table th {
+  font-weight: 700;
+  color: #888;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.orderId {
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.customerInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.customerInfo span {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Status Colors */
+.pending { background: #fff3e0; color: #e65100; }
+.confirmed { background: #e8f5e9; color: #1b5e20; }
+.preparing { background: #e3f2fd; color: #0d47a1; }
+.ready { background: #f3e5f5; color: #4a148c; }
+.delivered { background: #e8f5e9; color: #1b5e20; }
+.rejected { background: #ffebee; color: #c62828; }
+.cancelled { background: #eceff1; color: #37474f; }
+
+.statusSelect {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.statusSelect:focus {
+  border-color: var(--accent);
+}
+
+/* Add Cake Tab */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.inputGroup input, .inputGroup select {
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.inputGroup input:focus, .inputGroup select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(247, 202, 201, 0.2);
+}
+
+/* File Upload */
+.uploadGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.uploadGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.uploadArea {
+  border: 2px dashed rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.uploadArea:hover {
+  border-color: var(--accent);
+}
+
+.fileInput {
+  display: none;
+}
+
+.fileLabel {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  background: var(--section-alt);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fileLabel:hover {
+  background: var(--accent);
+}
+
+.previewContainer {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.preview {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.submitBtn {
+  align-self: flex-start;
+  padding: 0.75rem 2rem;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(45deg, var(--accent), var(--secondary));
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(247, 202, 201, 0.4);
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(247, 202, 201, 0.6);
+}
+
+.submitBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Messages */
+.message {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+}
+
+.errorMessage {
+  background: #ffebee;
+  color: #c62828;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* Base style for hamburger (hidden on desktop) */
+.hamburger {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--foreground);
+    padding: 0.5rem;
+  }
+
+  .sidebar {
+    left: -260px;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebarOpen {
+    left: 0 !important;
+  }
+
+  .mainContent {
+    margin-left: 0;
+    padding: 1rem;
+  }
+
+  .header {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .contentArea {
+    padding: 1rem;
+  }
+}
