@@ -5,9 +5,11 @@ import { useSearchParams } from 'next/navigation';
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import CakeCard from "../../components/CakeCard";
+import Pagination from "../../components/Pagination";
 import styles from "./cakes.module.css";
 
 const categories = ['all', 'wedding', 'birthday', 'photo', 'cupcake', 'fondant', 'cheesecake'];
+const CAKES_PER_PAGE = 12;
 
 function CakesContent() {
   const searchParams = useSearchParams();
@@ -16,14 +18,28 @@ function CakesContent() {
   const [cakes, setCakes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchCakes = async () => {
+      setLoading(true);
+      setError("");
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/cakes`);
+        const params = new URLSearchParams();
+        params.set('page', currentPage.toString());
+        params.set('limit', CAKES_PER_PAGE.toString());
+        if (selectedCategory !== 'all') {
+          params.set('category', selectedCategory);
+        }
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/cakes?${params.toString()}`
+        );
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Failed to fetch cakes");
         setCakes(data.data);
+        setTotalPages(data.pagination?.totalPages || 1);
       } catch (err: any) {
         setError(err.message || "Error fetching cakes");
       } finally {
@@ -31,11 +47,12 @@ function CakesContent() {
       }
     };
     fetchCakes();
-  }, []);
+  }, [selectedCategory, currentPage]);
 
-  const filteredCakes = selectedCategory === 'all' 
-    ? cakes 
-    : cakes.filter((cake: any) => cake.category === selectedCategory);
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setCurrentPage(1); // Reset to page 1 on category change
+  };
 
   return (
     <main className={styles.main}>
@@ -48,7 +65,7 @@ function CakesContent() {
             <button
               key={category}
               className={`${styles.filterBtn} ${selectedCategory === category ? styles.active : ''}`}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => handleCategoryChange(category)}
             >
               {category.charAt(0).toUpperCase() + category.slice(1)}
             </button>
@@ -59,14 +76,21 @@ function CakesContent() {
           <div style={{ textAlign: 'center', padding: '3rem' }}>Loading cakes...</div>
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: 'red' }}>{error}</div>
-        ) : filteredCakes.length === 0 ? (
+        ) : cakes.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem' }}>No cakes found in this category.</div>
         ) : (
-          <div className={styles.grid}>
-            {filteredCakes.map((cake: any) => (
-              <CakeCard key={cake._id} cake={cake} />
-            ))}
-          </div>
+          <>
+            <div className={styles.grid}>
+              {cakes.map((cake: any) => (
+                <CakeCard key={cake._id} cake={cake} />
+              ))}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </>
         )}
       </div>
     </main>

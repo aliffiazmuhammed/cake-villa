@@ -1,47 +1,51 @@
 .collection {
-  padding: 5rem 0;
+  padding: 6rem 0;
   background-color: var(--section-alt);
   text-align: center;
 }
 
 .heading {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+  font-size: 2.75rem;
+  margin-bottom: 0.75rem;
   color: var(--foreground);
+  font-weight: 800;
+  letter-spacing: -0.5px;
 }
 
 .subheading {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--foreground);
-  opacity: 0.7;
-  margin-bottom: 3rem;
+  opacity: 0.75;
+  margin-bottom: 4rem;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  gap: 2.25rem;
 }
 
 .card {
   background-color: var(--background);
-  border-radius: var(--border-radius);
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   text-align: left;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+  border-color: rgba(247, 202, 201, 0.3);
 }
 
 .cardImage {
-  height: 200px;
-  background-color: var(--secondary);
+  height: 180px;
+  background: linear-gradient(135deg, rgba(250, 218, 221, 0.5) 0%, rgba(168, 216, 234, 0.4) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,33 +53,101 @@
   overflow: hidden;
 }
 
+/* Glassmorphism Icon Container */
+.iconWrapper {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 2;
+}
+
 .cardIcon {
-  font-size: 4rem;
-  transition: transform 0.4s ease;
+  font-size: 3.25rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.06));
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: inline-block;
+}
+
+.card:hover .iconWrapper {
+  transform: scale(1.08);
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
 }
 
 .card:hover .cardIcon {
-  transform: scale(1.1);
+  transform: scale(1.12) rotate(6deg);
 }
 
 .cardContent {
-  padding: 1.5rem;
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
   flex-grow: 1;
 }
 
 .cardContent h3 {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   color: var(--foreground);
+  font-weight: 800;
+  letter-spacing: -0.2px;
 }
 
 .cardContent p {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  color: #666;
+  opacity: 0.9;
+  line-height: 1.6;
+  min-height: 48px; /* Keep description heights equal so buttons are always aligned */
+}
+
+/* Centered Pill Button with Interactive Arrow */
+.exploreBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  align-self: center;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  border-radius: 2rem;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 700;
+  font-size: 0.92rem;
   color: var(--foreground);
-  opacity: 0.7;
-  line-height: 1.5;
+  border: 2px solid var(--accent);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 0.5rem;
+}
+
+.exploreBtn span {
+  display: inline-block;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 1.1rem;
+}
+
+.exploreBtn:hover {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--foreground);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(247, 202, 201, 0.4);
+}
+
+.exploreBtn:hover span {
+  transform: translateX(5px);
 }
 
 /* Shimmer Effect */
@@ -88,14 +160,14 @@
   background: linear-gradient(
     to right,
     rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.35) 50%,
     rgba(255, 255, 255, 0) 100%
   );
   transform: skewX(-25deg);
 }
 
 .card:hover .shimmer {
-  animation: shimmer 0.8s ease;
+  animation: shimmer 0.9s ease-out;
 }
 
 @keyframes shimmer {
@@ -105,7 +177,16 @@
 }
 
 @media (max-width: 768px) {
+  .collection {
+    padding: 4rem 0;
+  }
+  
+  .heading {
+    font-size: 2.25rem;
+  }
+  
   .grid {
     grid-template-columns: 1fr;
+    gap: 1.75rem;
   }
 }

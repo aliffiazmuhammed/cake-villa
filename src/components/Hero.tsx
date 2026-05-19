@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import Link from 'next/link';
 import styles from './Hero.module.css';
 
 export default function Hero() {
@@ -62,8 +63,12 @@ export default function Hero() {
             Handcrafted custom cakes for your most precious moments — weddings, birthdays, and celebrations.
           </p>
           <div ref={ctaRef} className={styles.cta}>
-            <button className="btn btn-primary">Explore Our Cakes</button>
-            <button className="btn btn-outline">Get a Custom Quote</button>
+            <Link href="/cakes" className="btn btn-primary">
+              Explore Our Cakes
+            </Link>
+            <Link href="/#contact" className="btn btn-outline">
+              Get a Custom Quote
+            </Link>
           </div>
           
           <div ref={badgesRef} className={styles.badges}>

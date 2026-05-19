@@ -51,14 +51,16 @@ export default function Collection() {
           {categories.map((item, index) => (
             <div key={index} className={styles.card}>
               <div className={styles.cardImage}>
-                <span className={styles.cardIcon}>{item.icon}</span>
+                <div className={styles.iconWrapper}>
+                  <span className={styles.cardIcon}>{item.icon}</span>
+                </div>
                 <div className={styles.shimmer}></div>
               </div>
               <div className={styles.cardContent}>
                 <h3>{item.title}</h3>
                 <p>{item.desc}</p>
-                <Link href={`/cakes?category=${item.slug}`} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
-                  Explore
+                <Link href={`/cakes?category=${item.slug}`} className={styles.exploreBtn}>
+                  Explore <span>→</span>
                 </Link>
               </div>
             </div>

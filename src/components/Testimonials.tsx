@@ -1,22 +1,63 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import styles from './Testimonials.module.css';
 
-const testimonials = [
-  { name: 'Priya R.', occasion: 'Wedding', text: 'The wedding cake was beyond our expectations — looked like art, tasted even better!' },
-  { name: 'Anita M.', occasion: 'Birthday', text: 'Ordered a custom fondant cake for my son\'s 5th birthday. He was over the moon!' },
-  { name: 'Rahul K.', occasion: 'Anniversary', text: 'Best cheesecake I\'ve ever had. Super fresh and on-time delivery.' },
-  { name: 'Sreelakshmi T.', occasion: 'Anniversary', text: 'Beautiful photo cake for my mom\'s anniversary. Highly recommend!' },
+interface TestimonialItem {
+  name: string;
+  occasion: string;
+  text: string;
+  rating: number;
+}
+
+const fallbackTestimonials: TestimonialItem[] = [
+  { name: 'Priya R.', occasion: 'Wedding Cake Client', text: 'The wedding cake was beyond our expectations — looked like art, tasted even better!', rating: 5 },
+  { name: 'Anita M.', occasion: 'Birthday Cake Client', text: 'Ordered a custom fondant cake for my son\'s 5th birthday. He was over the moon!', rating: 5 },
+  { name: 'Rahul K.', occasion: 'Cheesecake Lover', text: 'Best cheesecake I\'ve ever had. Super fresh and on-time delivery.', rating: 5 },
+  { name: 'Sreelakshmi T.', occasion: 'Photo Cake Client', text: 'Beautiful photo cake for my mom\'s anniversary. Highly recommend!', rating: 5 },
 ];
 
 export default function Testimonials() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const [reviews, setReviews] = useState<TestimonialItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch 5-star feedbacks on mount
   useEffect(() => {
+    const fetch5StarReviews = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/feedback?rating=5&limit=4`
+        );
+        const data = await response.json();
+        if (response.ok && data.data && data.data.length > 0) {
+          const mapped: TestimonialItem[] = data.data.map((item: any) => ({
+            name: item.name,
+            occasion: 'Verified Buyer',
+            text: item.feedback,
+            rating: item.rating || 5,
+          }));
+          setReviews(mapped);
+        } else {
+          setReviews(fallbackTestimonials);
+        }
+      } catch (err) {
+        console.error("Error fetching testimonials:", err);
+        setReviews(fallbackTestimonials);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch5StarReviews();
+  }, []);
+
+  // GSAP animation triggered AFTER reviews are loaded and rendered
+  useEffect(() => {
+    if (loading || reviews.length === 0) return;
+
     gsap.registerPlugin(ScrollTrigger);
 
     if (cardsRef.current) {
@@ -57,7 +98,7 @@ export default function Testimonials() {
         }
       );
     }
-  }, []);
+  }, [loading, reviews]);
 
   return (
     <section id="testimonials" ref={sectionRef} className={styles.testimonials}>
@@ -65,14 +106,16 @@ export default function Testimonials() {
         <h2 className={styles.heading}>What Our Customers Say</h2>
         
         <div ref={cardsRef} className={styles.cards}>
-          {testimonials.map((item, index) => (
+          {reviews.map((item, index) => (
             <div key={index} className={styles.card}>
               <div className={styles.stars}>
-                <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+                {Array.from({ length: item.rating }).map((_, i) => (
+                  <span key={i}>⭐</span>
+                ))}
               </div>
               <p className={styles.text}>"{item.text}"</p>
               <div className={styles.author}>
-                <span className={styles.name}>{item.name}</span>
+                <span className={styles.name}>{item.name.toUpperCase()}</span>
                 <span className={styles.occasion}>{item.occasion}</span>
               </div>
             </div>

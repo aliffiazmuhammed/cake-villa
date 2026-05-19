@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
+import Pagination from "../../components/Pagination";
 import styles from "./admin.module.css";
 
 // Placeholders for Cloudinary
@@ -14,6 +15,11 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [ordersError, setOrdersError] = useState("");
+  
+  // State for testimonials list
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [loadingFeedbacks, setLoadingFeedbacks] = useState(false);
+  const [feedbacksError, setFeedbacksError] = useState("");
   
   // State for cakes list
   const [cakes, setCakes] = useState([]);
@@ -40,6 +46,24 @@ export default function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
+  // Pagination state
+  const [ordersPage, setOrdersPage] = useState(1);
+  const [ordersTotalPages, setOrdersTotalPages] = useState(1);
+  const [cakesPage, setCakesPage] = useState(1);
+  const [cakesTotalPages, setCakesTotalPages] = useState(1);
+
+  // Orders Search & Filter state
+  const [ordersSearch, setOrdersSearch] = useState("");
+  const [ordersStatusFilter, setOrdersStatusFilter] = useState("");
+  const [ordersPaymentFilter, setOrdersPaymentFilter] = useState("");
+  const [ordersDateFrom, setOrdersDateFrom] = useState("");
+  const [ordersDateTo, setOrdersDateTo] = useState("");
+
+  // Cakes Search & Filter state
+  const [cakesSearch, setCakesSearch] = useState("");
+  const [cakesCategoryFilter, setCakesCategoryFilter] = useState("");
+  const [cakesAvailableFilter, setCakesAvailableFilter] = useState("");
+
   const router = useRouter();
 
   // Check auth and fetch data
@@ -54,16 +78,40 @@ export default function AdminDashboard() {
       fetchOrders();
     } else if (activeTab === "cakes") {
       fetchCakes();
+    } else if (activeTab === "testimonials") {
+      fetchFeedbacks();
     }
-  }, [activeTab, router]);
+  }, [
+    activeTab,
+    router,
+    ordersPage,
+    cakesPage,
+    ordersSearch,
+    ordersStatusFilter,
+    ordersDateFrom,
+    ordersDateTo,
+    cakesSearch,
+    cakesCategoryFilter,
+    cakesAvailableFilter,
+    ordersPaymentFilter
+  ]);
 
   const fetchOrders = async () => {
     setLoadingOrders(true);
     setOrdersError("");
     try {
       const token = localStorage.getItem("adminToken");
+      const params = new URLSearchParams();
+      params.set('page', ordersPage.toString());
+      params.set('limit', '10');
+      if (ordersSearch) params.set('search', ordersSearch);
+      if (ordersStatusFilter) params.set('status', ordersStatusFilter);
+      if (ordersPaymentFilter) params.set('paymentStatus', ordersPaymentFilter);
+      if (ordersDateFrom) params.set('from', ordersDateFrom);
+      if (ordersDateTo) params.set('to', ordersDateTo);
+
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -73,6 +121,7 @@ export default function AdminDashboard() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Failed to fetch orders");
       setOrders(data.data);
+      setOrdersTotalPages(data.pagination?.totalPages || 1);
     } catch (err: any) {
       setOrdersError(err.message || "Error fetching orders");
     } finally {
@@ -84,16 +133,72 @@ export default function AdminDashboard() {
     setLoadingCakes(true);
     setCakesError("");
     try {
+      const params = new URLSearchParams();
+      params.set('page', cakesPage.toString());
+      params.set('limit', '10');
+      if (cakesSearch) params.set('search', cakesSearch);
+      if (cakesCategoryFilter && cakesCategoryFilter !== 'all') {
+        params.set('category', cakesCategoryFilter);
+      }
+      if (cakesAvailableFilter) params.set('available', cakesAvailableFilter);
+
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/cakes`
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/cakes?${params.toString()}`
       );
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Failed to fetch cakes");
       setCakes(data.data);
+      setCakesTotalPages(data.pagination?.totalPages || 1);
     } catch (err: any) {
       setCakesError(err.message || "Error fetching cakes");
     } finally {
       setLoadingCakes(false);
+    }
+  };
+
+  const fetchFeedbacks = async () => {
+    setLoadingFeedbacks(true);
+    setFeedbacksError("");
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/feedback`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to fetch testimonials");
+      setFeedbacks(data.data || []);
+    } catch (err: any) {
+      setFeedbacksError(err.message || "Error fetching testimonials");
+    } finally {
+      setLoadingFeedbacks(false);
+    }
+  };
+
+  const handleDeleteFeedback = async (feedbackId: string) => {
+    if (!confirm("Are you sure you want to delete this testimonial?")) return;
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/feedback/${feedbackId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to delete testimonial");
+      
+      setFeedbacks((prev) => prev.filter((item: any) => item._id !== feedbackId));
+      alert("Testimonial deleted successfully!");
+    } catch (err: any) {
+      alert(err.message || "Error deleting testimonial");
     }
   };
 
@@ -110,6 +215,86 @@ export default function AdminDashboard() {
     setImagePreview(cake.imageUrl);
     setEditingCakeId(cake._id);
     setActiveTab("add-cake"); // Switch to form tab
+  };
+
+  const handleToggleAvailability = async (cakeId: string) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/cakes/${cakeId}/toggle-availability`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to toggle availability");
+      
+      // Update local state
+      setCakes((prev: any) =>
+        prev.map((cake: any) =>
+          cake._id === cakeId ? { ...cake, available: !cake.available } : cake
+        )
+      );
+    } catch (err: any) {
+      alert(err.message || "Error toggling availability");
+    }
+  };
+
+  const handleAddPayment = async (orderId: string, amount: number, method: string, note: string) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders/${orderId}/payments`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ amount, method, note }),
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to add payment");
+
+      // Update selectedOrder and orders list
+      setSelectedOrder(data.data);
+      setOrders((prev: any) =>
+        prev.map((o: any) => (o._id === orderId ? data.data : o))
+      );
+      return true;
+    } catch (err: any) {
+      alert(err.message || "Error adding payment");
+      return false;
+    }
+  };
+
+  const handleRemovePayment = async (orderId: string, paymentId: string) => {
+    if (!confirm("Remove this payment entry?")) return;
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders/${orderId}/payments/${paymentId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to remove payment");
+
+      setSelectedOrder(data.data);
+      setOrders((prev: any) =>
+        prev.map((o: any) => (o._id === orderId ? data.data : o))
+      );
+    } catch (err: any) {
+      alert(err.message || "Error removing payment");
+    }
   };
 
   const handleDeleteClick = async (cakeId: string) => {
@@ -306,6 +491,12 @@ export default function AdminDashboard() {
             Cakes
           </button>
           <button
+            className={activeTab === "testimonials" ? styles.activeNav : ""}
+            onClick={() => { setActiveTab("testimonials"); setIsSidebarOpen(false); }}
+          >
+            Testimonials
+          </button>
+          <button
             className={activeTab === "add-cake" ? styles.activeNav : ""}
             onClick={() => { setActiveTab("add-cake"); setIsSidebarOpen(false); }}
           >
@@ -325,7 +516,7 @@ export default function AdminDashboard() {
           <button className={styles.hamburger} onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             ☰
           </button>
-          <h1>{activeTab === "orders" ? "Manage Orders" : activeTab === "cakes" ? "Manage Cakes" : editingCakeId ? "Edit Cake" : "Add New Cake"}</h1>
+          <h1>{activeTab === "orders" ? "Manage Orders" : activeTab === "cakes" ? "Manage Cakes" : activeTab === "testimonials" ? "Customer Testimonials" : editingCakeId ? "Edit Cake" : "Add New Cake"}</h1>
           <div className={styles.userInfo}>
             <span>Welcome, Admin</span>
           </div>
@@ -335,12 +526,83 @@ export default function AdminDashboard() {
           {/* Orders Tab */}
           {activeTab === "orders" && (
             <div className={styles.ordersSection}>
+              {/* Filter and Search Bar */}
+              <div className={styles.filterBar}>
+                <div className={styles.searchGroup}>
+                  <input
+                    type="text"
+                    placeholder="Search by ID, name, phone..."
+                    value={ordersSearch}
+                    onChange={(e) => {
+                      setOrdersSearch(e.target.value);
+                      setOrdersPage(1);
+                    }}
+                    className={styles.searchInput}
+                  />
+                </div>
+                <div className={styles.filterGroup}>
+                  <select
+                    value={ordersStatusFilter}
+                    onChange={(e) => {
+                      setOrdersStatusFilter(e.target.value);
+                      setOrdersPage(1);
+                    }}
+                    className={styles.filterSelect}
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="preparing">Preparing</option>
+                    <option value="ready">Ready</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                  <div className={styles.dateInputs}>
+                    <input
+                      type="date"
+                      value={ordersDateFrom}
+                      onChange={(e) => {
+                        setOrdersDateFrom(e.target.value);
+                        setOrdersPage(1);
+                      }}
+                      className={styles.dateInput}
+                      title="From Date"
+                    />
+                    <span className={styles.dateSeparator}>to</span>
+                    <input
+                      type="date"
+                      value={ordersDateTo}
+                      onChange={(e) => {
+                        setOrdersDateTo(e.target.value);
+                        setOrdersPage(1);
+                      }}
+                      className={styles.dateInput}
+                      title="To Date"
+                    />
+                  </div>
+                  <select
+                    value={ordersPaymentFilter}
+                    onChange={(e) => {
+                      setOrdersPaymentFilter(e.target.value);
+                      setOrdersPage(1);
+                    }}
+                    className={styles.filterSelect}
+                  >
+                    <option value="">All Payments</option>
+                    <option value="paid">Paid</option>
+                    <option value="partial">Partial</option>
+                    <option value="unpaid">Unpaid</option>
+                  </select>
+                </div>
+              </div>
+
               {loadingOrders ? (
                 <div className={styles.message}>Loading orders...</div>
               ) : ordersError ? (
                 <div className={styles.errorMessage}>{ordersError}</div>
               ) : orders.length === 0 ? (
-                <div className={styles.message}>No orders found.</div>
+                <div className={styles.message}>No orders found matching the filter criteria.</div>
               ) : (
                 <div className={styles.tableWrapper}>
                   <table className={styles.table}>
@@ -350,6 +612,7 @@ export default function AdminDashboard() {
                         <th>Customer</th>
                         <th>Date</th>
                         <th>Total</th>
+                        <th>Payment</th>
                         <th>Status</th>
                         <th>Actions</th>
                       </tr>
@@ -357,37 +620,47 @@ export default function AdminDashboard() {
                     <tbody>
                       {orders.map((order: any) => (
                         <tr key={order._id}>
-                          <td className={styles.orderId}>{order.orderId}</td>
-                          <td>
+                          <td data-label="Order ID" className={styles.orderId}>{order.orderId}</td>
+                          <td data-label="Customer">
                             <div className={styles.customerInfo}>
                               <strong>{order.customer.name}</strong>
                               <span>{order.customer.phone}</span>
                             </div>
                           </td>
-                          <td>
+                          <td data-label="Date">
                             {new Date(order.createdAt).toLocaleDateString()}
                           </td>
-                          <td>₹{order.totalAmount}</td>
-                          <td>
+                          <td data-label="Total">₹{order.totalAmount}</td>
+                          <td data-label="Payment">
+                            <span className={`${styles.paymentBadge} ${styles[`payment${(order.paymentStatus || 'unpaid').charAt(0).toUpperCase() + (order.paymentStatus || 'unpaid').slice(1)}`]}`}>
+                              {(order.paymentStatus || 'unpaid').charAt(0).toUpperCase() + (order.paymentStatus || 'unpaid').slice(1)}
+                            </span>
+                            {order.paymentStatus === 'partial' && (
+                              <div className={styles.paymentSubtext}>₹{order.amountPaid || 0} / ₹{order.totalAmount}</div>
+                            )}
+                          </td>
+                          <td data-label="Status">
                             <span className={`${styles.statusBadge} ${styles[order.status]}`}>
                               {order.status}
                             </span>
                           </td>
-                          <td>
-                            <button onClick={() => setSelectedOrder(order)} style={{ marginRight: '0.5rem', padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid #ccc', background: '#f0f0f0', cursor: 'pointer' }}>View</button>
-                            <select
-                              value={order.status}
-                              onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
-                              className={styles.statusSelect}
-                            >
-                              <option value="pending">Pending</option>
-                              <option value="confirmed">Confirmed</option>
-                              <option value="preparing">Preparing</option>
-                              <option value="ready">Ready</option>
-                              <option value="delivered">Delivered</option>
-                              <option value="rejected">Rejected</option>
-                              <option value="cancelled">Cancelled</option>
-                            </select>
+                          <td data-label="Actions">
+                            <div className={styles.actionsContainer}>
+                              <button onClick={() => setSelectedOrder(order)} className={styles.viewBtn}>View</button>
+                              <select
+                                value={order.status}
+                                onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
+                                className={styles.statusSelect}
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="preparing">Preparing</option>
+                                <option value="ready">Ready</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="cancelled">Cancelled</option>
+                              </select>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -395,18 +668,70 @@ export default function AdminDashboard() {
                   </table>
                 </div>
               )}
+              <Pagination
+                currentPage={ordersPage}
+                totalPages={ordersTotalPages}
+                onPageChange={setOrdersPage}
+              />
             </div>
           )}
 
           {/* Cakes Tab */}
           {activeTab === "cakes" && (
             <div className={styles.cakesSection}>
+              {/* Filter and Search Bar */}
+              <div className={styles.filterBar}>
+                <div className={styles.searchGroup}>
+                  <input
+                    type="text"
+                    placeholder="Search cakes by name..."
+                    value={cakesSearch}
+                    onChange={(e) => {
+                      setCakesSearch(e.target.value);
+                      setCakesPage(1);
+                    }}
+                    className={styles.searchInput}
+                  />
+                </div>
+                <div className={styles.filterGroup}>
+                  <select
+                    value={cakesCategoryFilter}
+                    onChange={(e) => {
+                      setCakesCategoryFilter(e.target.value);
+                      setCakesPage(1);
+                    }}
+                    className={styles.filterSelect}
+                  >
+                    <option value="">All Categories</option>
+                    <option value="wedding">Wedding</option>
+                    <option value="birthday">Birthday</option>
+                    <option value="photo">Photo</option>
+                    <option value="cupcake">Cupcake</option>
+                    <option value="fondant">Fondant</option>
+                    <option value="cheesecake">Cheesecake</option>
+                  </select>
+
+                  <select
+                    value={cakesAvailableFilter}
+                    onChange={(e) => {
+                      setCakesAvailableFilter(e.target.value);
+                      setCakesPage(1);
+                    }}
+                    className={styles.filterSelect}
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="true">Available</option>
+                    <option value="false">Unavailable</option>
+                  </select>
+                </div>
+              </div>
+
               {loadingCakes ? (
                 <div className={styles.message}>Loading cakes...</div>
               ) : cakesError ? (
                 <div className={styles.errorMessage}>{cakesError}</div>
               ) : cakes.length === 0 ? (
-                <div className={styles.message}>No cakes found.</div>
+                <div className={styles.message}>No cakes found matching the filter criteria.</div>
               ) : (
                 <div className={styles.tableWrapper}>
                   <table className={styles.table}>
@@ -423,22 +748,99 @@ export default function AdminDashboard() {
                     <tbody>
                       {cakes.map((cake: any) => (
                         <tr key={cake._id}>
-                          <td>
+                          <td data-label="Photo">
                             {cake.imageUrl && (
-                              <img src={cake.imageUrl} alt={cake.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }} />
+                              <img src={cake.imageUrl} alt={cake.name} className={styles.cakePhoto} />
                             )}
                           </td>
-                          <td><strong>{cake.name}</strong></td>
-                          <td>{cake.category}</td>
-                          <td>₹{cake.price}</td>
-                          <td>
+                          <td data-label="Name"><strong>{cake.name}</strong></td>
+                          <td data-label="Category">{cake.category}</td>
+                          <td data-label="Price">₹{cake.price}</td>
+                          <td data-label="Status">
                             <span className={`${styles.statusBadge} ${cake.available ? styles.confirmed : styles.rejected}`}>
                               {cake.available ? "Available" : "Unavailable"}
                             </span>
                           </td>
-                          <td>
-                            <button onClick={() => handleEditClick(cake)} style={{ marginRight: '0.5rem', padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid #ccc', background: '#f0f0f0', cursor: 'pointer' }}>Edit</button>
-                            <button onClick={() => handleDeleteClick(cake._id)} style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid #ffcdd2', background: '#ffebee', color: '#c62828', cursor: 'pointer' }}>Delete</button>
+                          <td data-label="Actions">
+                            <div className={styles.actionsContainer}>
+                              <button
+                                onClick={() => handleToggleAvailability(cake._id)}
+                                className={`${styles.statusToggleBtn} ${cake.available ? styles.btnMakeUnavailable : styles.btnMakeAvailable}`}
+                              >
+                                {cake.available ? "Disable" : "Enable"}
+                              </button>
+                              <button onClick={() => handleEditClick(cake)} className={styles.editBtn}>Edit</button>
+                              <button onClick={() => handleDeleteClick(cake._id)} className={styles.deleteBtn}>Delete</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              <Pagination
+                currentPage={cakesPage}
+                totalPages={cakesTotalPages}
+                onPageChange={setCakesPage}
+              />
+            </div>
+          )}
+
+          {/* Testimonials Tab */}
+          {activeTab === "testimonials" && (
+            <div className={styles.cakesSection}>
+              {loadingFeedbacks ? (
+                <div className={styles.message}>Loading testimonials...</div>
+              ) : feedbacksError ? (
+                <div className={styles.errorMessage}>{feedbacksError}</div>
+              ) : feedbacks.length === 0 ? (
+                <div className={styles.message}>No testimonials found.</div>
+              ) : (
+                <div className={styles.tableWrapper}>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Reviewer Name</th>
+                        <th>Rating</th>
+                        <th>Feedback / Comment</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {feedbacks.map((item: any) => (
+                        <tr key={item._id}>
+                          <td data-label="Date">
+                            {new Date(item.createdAt).toLocaleDateString()}
+                          </td>
+                          <td data-label="Reviewer Name">
+                            <strong>{item.name}</strong>
+                          </td>
+                          <td data-label="Rating">
+                            <div className={styles.adminRatingStars}>
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <span
+                                  key={i}
+                                  className={i < item.rating ? styles.filledStar : styles.emptyStar}
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                          <td data-label="Feedback" className={styles.feedbackTextCell}>
+                            "{item.feedback}"
+                          </td>
+                          <td data-label="Actions">
+                            <div className={styles.actionsContainer}>
+                              <button
+                                onClick={() => handleDeleteFeedback(item._id)}
+                                className={styles.deleteBtn}
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -531,6 +933,17 @@ export default function AdminDashboard() {
                       required
                     />
                   </div>
+
+                  <div className={styles.checkboxGroup}>
+                    <input
+                      type="checkbox"
+                      id="available"
+                      checked={cakeForm.available}
+                      onChange={(e) => setCakeForm({ ...cakeForm, available: e.target.checked })}
+                      className={styles.checkboxInput}
+                    />
+                    <label htmlFor="available" className={styles.checkboxLabel}>Available for Ordering</label>
+                  </div>
                 </div>
 
                 {/* File Upload */}
@@ -573,38 +986,23 @@ export default function AdminDashboard() {
       </main>
       {/* Order Detail Modal */}
       {selectedOrder && typeof document !== 'undefined' && createPortal(
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.5)',
-          display: 'flex', justifyContent: 'center', alignItems: 'center',
-          zIndex: 9999,
-          padding: '1rem'
-        }}>
-          <div style={{
-            background: 'white',
-            padding: '2rem',
-            borderRadius: '16px',
-            width: '100%',
-            maxWidth: '600px',
-            maxHeight: '90vh',
-            overflowY: 'auto'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ margin: 0 }}>Order Details: {selectedOrder.orderId}</h2>
-              <button onClick={() => setSelectedOrder(null)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h2>Order Details: {selectedOrder.orderId}</h2>
+              <button onClick={() => setSelectedOrder(null)} className={styles.modalCloseBtn}>×</button>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '1.5rem' }}>
-              <div>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#888' }}>Customer Info</h3>
+            <div className={styles.modalGrid}>
+              <div className={styles.modalInfoGroup}>
+                <h3>Customer Info</h3>
                 <p><strong>Name:</strong> {selectedOrder.customer.name}</p>
                 <p><strong>Phone:</strong> {selectedOrder.customer.phone}</p>
                 <p><strong>Email:</strong> {selectedOrder.customer.email || 'N/A'}</p>
               </div>
               
-              <div>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#888' }}>Delivery Info</h3>
+              <div className={styles.modalInfoGroup}>
+                <h3>Delivery Info</h3>
                 <p><strong>Address:</strong> {selectedOrder.delivery?.address || 'N/A'}</p>
                 <p><strong>City:</strong> {selectedOrder.delivery?.city || 'N/A'}</p>
                 <p><strong>Pincode:</strong> {selectedOrder.delivery?.pincode || 'N/A'}</p>
@@ -613,35 +1011,149 @@ export default function AdminDashboard() {
               </div>
             </div>
             
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#888' }}>Items</h3>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #eee', textAlign: 'left' }}>
-                    <th style={{ padding: '0.5rem' }}>Cake</th>
-                    <th style={{ padding: '0.5rem' }}>Qty</th>
-                    <th style={{ padding: '0.5rem' }}>Size</th>
-                    <th style={{ padding: '0.5rem' }}>Message</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedOrder.items.map((item: any, index: number) => (
-                    <tr key={index} style={{ borderBottom: '1px solid #eee' }}>
-                      <td style={{ padding: '0.5rem' }}>{item.cake?.name || 'Unknown Cake'}</td>
-                      <td style={{ padding: '0.5rem' }}>{item.quantity}</td>
-                      <td style={{ padding: '0.5rem' }}>{item.size} kg</td>
-                      <td style={{ padding: '0.5rem' }}>{item.message || 'N/A'}</td>
+            <div className={styles.modalItemsSection}>
+              <h3>Items</h3>
+              <div className={styles.modalTableWrapper}>
+                <table className={styles.modalTable}>
+                  <thead>
+                    <tr>
+                      <th>Cake</th>
+                      <th>Qty</th>
+                      <th>Size</th>
+                      <th>Message</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {selectedOrder.items.map((item: any, index: number) => (
+                      <tr key={index}>
+                        <td data-label="Cake">{item.cake?.name || 'Unknown Cake'}</td>
+                        <td data-label="Qty">{item.quantity}</td>
+                        <td data-label="Size">{item.size} kg</td>
+                        <td data-label="Message">{item.message || 'N/A'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <strong>Status:</strong> {selectedOrder.status}
+            {/* Payment Section */}
+            <div className={styles.paymentSection}>
+              <h3>Payment</h3>
+              <div className={styles.paymentSummary}>
+                <div className={styles.paymentCard}>
+                  <span className={styles.paymentCardLabel}>Total</span>
+                  <span className={styles.paymentCardValue}>₹{selectedOrder.totalAmount}</span>
+                </div>
+                <div className={styles.paymentCard}>
+                  <span className={styles.paymentCardLabel}>Paid</span>
+                  <span className={styles.paymentCardValue}>₹{selectedOrder.amountPaid || 0}</span>
+                </div>
+                <div className={styles.paymentCard}>
+                  <span className={styles.paymentCardLabel}>Balance</span>
+                  <span className={styles.paymentCardValue}>₹{selectedOrder.totalAmount - (selectedOrder.amountPaid || 0)}</span>
+                </div>
               </div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
+              <div className={styles.paymentProgressWrap}>
+                <div
+                  className={styles.paymentProgressBar}
+                  style={{ width: `${Math.min(100, Math.round(((selectedOrder.amountPaid || 0) / selectedOrder.totalAmount) * 100))}%` }}
+                />
+              </div>
+
+              {/* Payment History */}
+              {selectedOrder.payments && selectedOrder.payments.length > 0 && (
+                <div className={styles.paymentTimeline}>
+                  {[...selectedOrder.payments].reverse().map((p: any) => (
+                    <div key={p._id} className={styles.paymentEntry}>
+                      <div className={styles.paymentEntryDot} />
+                      <div className={styles.paymentEntryContent}>
+                        <div className={styles.paymentEntryTop}>
+                          <strong>₹{p.amount}</strong>
+                          <span className={styles.paymentMethod}>{(p.method || 'cash').replace('_', ' ')}</span>
+                          <button
+                            onClick={() => handleRemovePayment(selectedOrder._id, p._id)}
+                            className={styles.removePaymentBtn}
+                            title="Remove payment"
+                          >
+                            🗑
+                          </button>
+                        </div>
+                        {p.note && <div className={styles.paymentNote}>{p.note}</div>}
+                        <div className={styles.paymentDate}>{new Date(p.paidAt).toLocaleString()}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add Payment Form */}
+              {(selectedOrder.totalAmount - (selectedOrder.amountPaid || 0)) > 0 && (
+                <form
+                  className={styles.paymentForm}
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const form = e.target as HTMLFormElement;
+                    const amount = parseFloat((form.elements.namedItem('payAmount') as HTMLInputElement).value);
+                    const method = (form.elements.namedItem('payMethod') as HTMLSelectElement).value;
+                    const note = (form.elements.namedItem('payNote') as HTMLInputElement).value;
+                    if (!amount || amount <= 0) return;
+                    const success = await handleAddPayment(selectedOrder._id, amount, method, note);
+                    if (success) form.reset();
+                  }}
+                >
+                  <input
+                    type="number"
+                    name="payAmount"
+                    placeholder="Amount"
+                    min="1"
+                    max={selectedOrder.totalAmount - (selectedOrder.amountPaid || 0)}
+                    step="any"
+                    required
+                    className={styles.paymentInput}
+                  />
+                  <select name="payMethod" className={styles.paymentMethodSelect}>
+                    <option value="cash">Cash</option>
+                    <option value="upi">UPI</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="card">Card</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <input
+                    type="text"
+                    name="payNote"
+                    placeholder="Note (optional)"
+                    className={styles.paymentInput}
+                  />
+                  <button type="submit" className={styles.recordPaymentBtn}>
+                    + Record
+                  </button>
+                </form>
+              )}
+            </div>
+
+            <div className={styles.modalFooter}>
+              <div className={styles.modalStatusUpdate}>
+                <strong>Status:</strong>
+                <select
+                  value={selectedOrder.status}
+                  onChange={(e) => {
+                    const newStatus = e.target.value;
+                    handleStatusUpdate(selectedOrder._id, newStatus);
+                    setSelectedOrder((prev: any) => prev ? { ...prev, status: newStatus } : null);
+                  }}
+                  className={styles.statusSelect}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="preparing">Preparing</option>
+                  <option value="ready">Ready</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div className={styles.modalTotal}>
                 Total: ₹{selectedOrder.totalAmount}
               </div>
             </div>

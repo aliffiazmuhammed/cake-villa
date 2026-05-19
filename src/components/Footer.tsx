@@ -15,10 +15,10 @@ export default function Footer() {
         <div className={styles.linksSection}>
           <h3>Quick Links</h3>
           <ul>
-            <li><Link href="#home">Home</Link></li>
-            <li><Link href="#collection">Our Cakes</Link></li>
-            <li><Link href="#about">About</Link></li>
-            <li><Link href="#contact">Contact</Link></li>
+            <li><Link href="/#home">Home</Link></li>
+            <li><Link href="/#collection">Our Cakes</Link></li>
+            <li><Link href="/#about">About</Link></li>
+            <li><Link href="/#contact">Contact</Link></li>
           </ul>
         </div>
         

@@ -330,6 +330,214 @@
   margin-bottom: 1rem;
 }
 
+.actionsContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.viewBtn, .editBtn {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #f8f9fa;
+  color: var(--foreground);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewBtn:hover, .editBtn:hover {
+  background: #e9ecef;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.deleteBtn {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ffcdd2;
+  background: #ffebee;
+  color: #c62828;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteBtn:hover {
+  background: #ffcdd2;
+}
+
+.cakePhoto {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Modal Styles */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 1.5rem;
+}
+
+.modalContent {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: modalEnter 0.3s ease-out;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 1rem;
+}
+
+.modalHeader h2 {
+  font-family: var(--font-heading), serif;
+  font-size: 1.5rem;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.modalCloseBtn {
+  background: rgba(0, 0, 0, 0.03);
+  border: none;
+  font-size: 1.5rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.modalCloseBtn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--foreground);
+}
+
+.modalGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.modalInfoGroup h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.75rem;
+}
+
+.modalInfoGroup p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+
+.modalInfoGroup strong {
+  color: var(--foreground);
+}
+
+.modalItemsSection h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 0.5rem;
+}
+
+.modalTableWrapper {
+  overflow-x: auto;
+}
+
+.modalTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.modalTable th, .modalTable td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 0.95rem;
+}
+
+.modalTable th {
+  font-weight: 700;
+  color: #999;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 1.5rem;
+  margin-top: auto;
+}
+
+.modalStatusUpdate {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modalStatusUpdate strong {
+  font-weight: 700;
+  color: #666;
+}
+
+.modalTotal {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
 /* Base style for hamburger (hidden on desktop) */
 .hamburger {
   display: none;
@@ -359,6 +567,10 @@
   .mainContent {
     margin-left: 0;
     padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
   }
 
   .header {
@@ -372,5 +584,608 @@
 
   .contentArea {
     padding: 1rem;
+    box-sizing: border-box;
+    width: 100%;
   }
+
+  /* Responsive card-morphing tables */
+  .table, .table thead, .table tbody, .table tr, .table td {
+    display: block;
+  }
+
+  .table thead {
+    display: none; /* Hide table headers */
+  }
+
+  .table tr {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  }
+
+  .table td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    padding: 0.75rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    text-align: left;
+  }
+
+  .table td:last-child {
+    border-bottom: none;
+    padding-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .actionsContainer {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* Responsive Modal table & structure */
+  .modalContent {
+    padding: 1.5rem;
+    max-height: 95vh;
+    gap: 1.5rem;
+  }
+
+  .modalGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .modalTable, .modalTable thead, .modalTable tbody, .modalTable tr, .modalTable td {
+    display: block;
+  }
+
+  .modalTable thead {
+    display: none;
+  }
+
+  .modalTable tr {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+  }
+
+  .modalTable td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    padding: 0.5rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right;
+  }
+
+  .modalTable td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+
+  .modalTable td:last-child {
+    border-bottom: none;
+  }
+
+  .modalFooter {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .modalStatusUpdate {
+    justify-content: space-between;
+  }
+
+  .modalTotal {
+    text-align: right;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08);
+    padding-top: 0.75rem;
+  }
+}
+
+/* Filter and Search Bar styles */
+.filterBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  background: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.searchGroup {
+  flex: 1;
+  min-width: 250px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.95rem;
+  color: var(--foreground);
+  background-color: #fafafa;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.searchInput:focus {
+  outline: none;
+  background-color: white;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(247, 202, 201, 0.2);
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filterSelect {
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.95rem;
+  color: var(--foreground);
+  background-color: #fafafa;
+  cursor: pointer;
+  min-width: 160px;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.filterSelect:focus {
+  outline: none;
+  background-color: white;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(247, 202, 201, 0.2);
+}
+
+.dateInputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
+.dateInput {
+  border: none;
+  background: transparent;
+  padding: 0.5rem 0.25rem;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.9rem;
+  color: var(--foreground);
+  outline: none;
+  cursor: pointer;
+}
+
+.dateSeparator {
+  font-size: 0.85rem;
+  color: #999;
+  font-weight: 500;
+  user-select: none;
+}
+
+/* Checkbox group inside form grid */
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  grid-column: span 1;
+}
+
+.checkboxInput {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.checkboxLabel {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--foreground);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Status toggle button in table */
+.statusToggleBtn {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
+}
+
+.btnMakeUnavailable {
+  background-color: #fff5f5;
+  color: #e03131;
+  border-color: #ffc9c9;
+}
+
+.btnMakeUnavailable:hover {
+  background-color: #ffe3e3;
+  border-color: #fa5252;
+}
+
+.btnMakeAvailable {
+  background-color: #ebfbee;
+  color: #2b8a3e;
+  border-color: #c3fae8;
+}
+
+.btnMakeAvailable:hover {
+  background-color: #d3f9d8;
+  border-color: #40c057;
+}
+
+/* Responsive styles for filterBar */
+@media (max-width: 768px) {
+  .filterBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .filterGroup {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .filterSelect {
+    width: 100%;
+  }
+
+  .dateInputs {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dateInput {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .checkboxGroup {
+    grid-column: span 1;
+    margin-top: 0.5rem;
+  }
+}
+
+/* ─── Payment Badge (Orders Table) ─── */
+.paymentBadge {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+}
+
+.paymentPaid {
+  background-color: #d3f9d8;
+  color: #2b8a3e;
+}
+
+.paymentPartial {
+  background-color: #fff3bf;
+  color: #e67700;
+}
+
+.paymentUnpaid {
+  background-color: #ffe3e3;
+  color: #c92a2a;
+}
+
+.paymentSubtext {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 0.25rem;
+}
+
+/* ─── Payment Section (Modal) ─── */
+.paymentSection {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 1.5rem;
+}
+
+.paymentSection h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+
+.paymentSummary {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.paymentCard {
+  flex: 1;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.paymentCardLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.paymentCardValue {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+/* Progress Bar */
+.paymentProgressWrap {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.paymentProgressBar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--primary));
+  border-radius: 10px;
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  min-width: 0;
+}
+
+/* Payment Timeline */
+.paymentTimeline {
+  margin-bottom: 1.25rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(0, 0, 0, 0.08);
+}
+
+.paymentEntry {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.paymentEntryDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-top: 0.35rem;
+  flex-shrink: 0;
+  margin-left: -1.35rem;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.paymentEntryContent {
+  flex: 1;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.paymentEntryTop {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.paymentEntryTop strong {
+  font-size: 1rem;
+  color: var(--foreground);
+}
+
+.paymentMethod {
+  font-size: 0.78rem;
+  padding: 0.15rem 0.5rem;
+  background: #e9ecef;
+  border-radius: 6px;
+  text-transform: capitalize;
+  color: #555;
+  font-weight: 600;
+}
+
+.removePaymentBtn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  padding: 0.1rem 0.3rem;
+}
+
+.removePaymentBtn:hover {
+  opacity: 1;
+}
+
+.paymentNote {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.3rem;
+  font-style: italic;
+}
+
+.paymentDate {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-top: 0.2rem;
+}
+
+/* Add Payment Form */
+.paymentForm {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #f1f3f5;
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.paymentInput {
+  flex: 1;
+  min-width: 80px;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.9rem;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.paymentInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.paymentMethodSelect {
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.paymentMethodSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.recordPaymentBtn {
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  color: var(--foreground);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.recordPaymentBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(247, 202, 201, 0.4);
+}
+
+/* ─── Payment Responsive ─── */
+@media (max-width: 768px) {
+  .paymentSummary {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .paymentCard {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.65rem 1rem;
+  }
+
+  .paymentForm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .paymentInput,
+  .paymentMethodSelect {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .paymentEntryTop {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+}
+
+/* ─── Testimonials management styles ─── */
+.adminRatingStars {
+  display: flex;
+  gap: 2px;
+  font-size: 1.1rem;
+}
+
+.filledStar {
+  color: #ffb800;
+}
+
+.emptyStar {
+  color: #d1d1d1;
+}
+
+.feedbackTextCell {
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
+  color: #555;
+  font-style: italic;
 }
